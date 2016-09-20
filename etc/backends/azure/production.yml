@@ -1,2 +1,6 @@
 model_extensions_dir: <%= File.join(Rails.application.config.rocci_server_etc_dir, 'backends', 'azure', 'model') %>
 fixtures_dir: <%= File.join(Rails.application.config.rocci_server_etc_dir, 'backends', 'azure', 'fixtures') %>
+subscription_id: <%= ENV['ROCCI_SERVER_AZURE_SUBSCRIPTION_ID'] %>
+tenant_id: <%= ENV['ROCCI_SERVER_AZURE_TENANT_ID'] %>
+client_id: <%= ENV['ROCCI_SERVER_AZURE_CLIENT_ID'] %>
+client_secret: <%= ENV['ROCCI_SERVER_AZURE_CLIENT_SECRET'] %>

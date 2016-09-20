@@ -118,4 +118,10 @@
     SetEnv ROCCI_SERVER_EC2_NETWORK_DESTROY_ALLOWED    no
     SetEnv ROCCI_SERVER_EC2_NETWORK_DESTROY_VPN_GWS    no
     SetEnv ROCCI_SERVER_EC2_VO_AWS_MAPFILE             ""
+
+    ## Azure Backend
+    SetEnv ROCCI_SERVER_AZURE_SUBSCRIPTION_ID=azureSubscriptionID
+    SetEnv ROCCI_SERVER_AZURE_TENANT_ID=azureTenant
+    SetEnv ROCCI_SERVER_AZURE_CLIENT_ID=azureClientID
+    SetEnv ROCCI_SERVER_AZURE_CLIENT_SECRET=verySecretClientPassphrase
 </VirtualHost>

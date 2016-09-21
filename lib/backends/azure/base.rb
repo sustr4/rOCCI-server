@@ -15,8 +15,13 @@ module Backends
         @logger = logger || Rails.logger
         @dalli_cache = dalli_cache
         @other_backends = {}
+#        @azure_client = nil
 
-        path = @options.fixtures_dir || ''
+        # establish connection with Azure
+#        run_authn unless Rails.env.test? # disable early auth for tests
+
+
+        path = @options.fixtures_dir || '' # TODO Remove eventually?
         read_fixtures(path)
       end
 
@@ -96,6 +101,28 @@ end
 
         File.join(path, "#{fixture_type}.json")
       end
+
+
+#      def run_authn
+#        return if @azure_client
+#
+#        @resource_group = resource_group
+#        @subscription_id = subscription_id
+#        pub_ssh_key_path = File.expand_path('~/.ssh/id_rsa.pub') #TODO remove hard-coded key
+#        raise ArgumentError.new("The path: #{pub_ssh_key_path} does not exist.") unless File.exist?(pub_ssh_key_path)
+#        @pub_ssh_key = File.read(pub_ssh_key_path)
+#        provider = MsRestAzure::ApplicationTokenProvider.new(
+#            @options.tenant_id,
+#            @options.client_id,
+#            @options.client_secret)
+#        credentials = MsRest::TokenCredentials.new(provider)
+#        @azure_client = Azure::ARM::Resources::ResourceManagementClient.new(credentials)
+#
+#        fail Backends::Errors::AuthenticationError, 'Could not get an Azure client for the current user!' unless @azure_client
+#        @azure_client.subscription_id = @options.subscription_id
+#
+#      end
+
     end
   end
 end

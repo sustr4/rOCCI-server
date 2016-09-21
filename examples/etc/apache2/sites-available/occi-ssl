@@ -122,6 +122,7 @@
     ## Azure Backend
     SetEnv ROCCI_SERVER_AZURE_SUBSCRIPTION_ID=azureSubscriptionID
     SetEnv ROCCI_SERVER_AZURE_TENANT_ID=azureTenant
+    SetEnv ROCCI_SERVER_AZURE_RESOURCE_GROUP=OCCI
     SetEnv ROCCI_SERVER_AZURE_CLIENT_ID=azureClientID
     SetEnv ROCCI_SERVER_AZURE_CLIENT_SECRET=verySecretClientPassphrase
 </VirtualHost>

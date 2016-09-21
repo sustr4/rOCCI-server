@@ -6,9 +6,9 @@ authn_strategies:
 hooks:
   - dummy
 backend:
-  compute: dummy
-  storage: dummy
-  network: dummy
+  compute: azure
+  storage: azure
+  network: azure
 log_level: debug
 log_requests_in_debug: true
 tempdir: /tmp/rocci_server

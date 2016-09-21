@@ -1,1 +1,2 @@
 # Deps for the Azure backend
+gem 'azure_mgmt_resources', '~> 0.4.0'

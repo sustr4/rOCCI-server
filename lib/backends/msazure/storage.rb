@@ -1,9 +1,9 @@
 module Backends
-  module Azure
-    class Network < Backends::Azure::Base
-      # Gets all network instance IDs, no details, no duplicates. Returned
+  module Msazure
+    class Storage < Backends::Msazure::Base
+      # Gets all storage instance IDs, no details, no duplicates. Returned
       # identifiers must correspond to those found in the occi.core.id
-      # attribute of ::Occi::Infrastructure::Network instances.
+      # attribute of ::Occi::Infrastructure::Storage instances.
       #
       # @example
       #    list_ids #=> []
@@ -11,75 +11,75 @@ module Backends
       #                             "ggf4f65adfadf-adgg4ad-daggad-fydd4fadyfdfd"]
       #
       # @param mixins [::Occi::Core::Mixins] a filter containing mixins
-      # @return [Array<String>] IDs for all available network instances
+      # @return [Array<String>] IDs for all available storage instances
       def list_ids(mixins = nil)
-        list(mixins).to_a.map { |n| n.id }
+        list(mixins).to_a.map { |s| s.id }
       end
 
-      # Gets all network instances, instances must be filtered
+      # Gets all storage instances, instances must be filtered
       # by the specified filter, filter (if set) must contain an ::Occi::Core::Mixins instance.
-      # Returned collection must contain ::Occi::Infrastructure::Network instances
+      # Returned collection must contain ::Occi::Infrastructure::Storage instances
       # wrapped in ::Occi::Core::Resources.
       #
       # @example
-      #    networks = list #=> #<::Occi::Core::Resources>
-      #    networks.first #=> #<::Occi::Infrastructure::Network>
+      #    storages = list #=> #<::Occi::Core::Resources>
+      #    storages.first #=> #<::Occi::Infrastructure::Storage>
       #
       #    mixins = ::Occi::Core::Mixins.new << ::Occi::Core::Mixin.new
-      #    networks = list(mixins) #=> #<::Occi::Core::Resources>
+      #    storages = list(mixins) #=> #<::Occi::Core::Resources>
       #
       # @param mixins [::Occi::Core::Mixins] a filter containing mixins
-      # @return [::Occi::Core::Resources] a collection of network instances
+      # @return [::Occi::Core::Resources] a collection of storage instances
       def list(mixins = nil)
         if mixins.blank?
-          read_network_fixtures
+          read_storage_fixtures
         else
-          filtered_networks = read_network_fixtures.to_a.select { |n| (n.mixins & mixins).any? }
-          ::Occi::Core::Resources.new filtered_networks
+          filtered_storages = read_storage_fixtures.to_a.select { |s| (s.mixins & mixins).any? }
+          ::Occi::Core::Resources.new filtered_storages
         end
       end
 
-      # Gets a specific network instance as ::Occi::Infrastructure::Network.
+      # Gets a specific storage instance as ::Occi::Infrastructure::Storage.
       # ID given as an argument must match the occi.core.id attribute inside
-      # the returned ::Occi::Infrastructure::Network instance, however it is possible
+      # the returned ::Occi::Infrastructure::Storage instance, however it is possible
       # to implement internal mapping to a platform-specific identifier.
       #
       # @example
-      #    network = get('65d4f65adfadf-ad2f4ad-daf5ad-f5ad4fad4ffdf')
-      #        #=> #<::Occi::Infrastructure::Network>
+      #    storage = get('65d4f65adfadf-ad2f4ad-daf5ad-f5ad4fad4ffdf')
+      #        #=> #<::Occi::Infrastructure::Storage>
       #
-      # @param network_id [String] OCCI identifier of the requested network instance
-      # @return [::Occi::Infrastructure::Network, nil] a network instance or `nil`
-      def get(network_id)
-        found = read_network_fixtures.to_a.select { |n| n.id == network_id }.first
-        fail Backends::Errors::ResourceNotFoundError, "Instance with ID #{network_id} does not exist!" unless found
+      # @param storage_id [String] OCCI identifier of the requested storage instance
+      # @return [::Occi::Infrastructure::Storage, nil] a storage instance or `nil`
+      def get(storage_id)
+        found = read_storage_fixtures.to_a.select { |s| s.id == storage_id }.first
+        fail Backends::Errors::ResourceNotFoundError, "Instance with ID #{storage_id} does not exist!" unless found
 
         found
       end
 
-      # Instantiates a new network instance from ::Occi::Infrastructure::Network.
+      # Instantiates a new storage instance from ::Occi::Infrastructure::Storage.
       # ID given in the occi.core.id attribute is optional and can be changed
       # inside this method. Final occi.core.id must be returned as a String.
       # If the requested instance cannot be created, an error describing the
       # problem must be raised, @see Backends::Errors.
       #
       # @example
-      #    network = ::Occi::Infrastructure::Network.new
-      #    network_id = create(network)
+      #    storage = ::Occi::Infrastructure::Storage.new
+      #    storage_id = create(storage)
       #        #=> "65d4f65adfadf-ad2f4ad-daf5ad-f5ad4fad4ffdf"
       #
-      # @param network [::Occi::Infrastructure::Network] network instance containing necessary attributes
-      # @return [String] final identifier of the new network instance
-      def create(network)
-        fail Backends::Errors::IdentifierConflictError, "Instance with ID #{network.id} already exists!" if list_ids.include?(network.id)
+      # @param storage [::Occi::Infrastructure::Storage] storage instance containing necessary attributes
+      # @return [String] final identifier of the new storage instance
+      def create(storage)
+        fail Backends::Errors::IdentifierConflictError, "Instance with ID #{storage.id} already exists!" if list_ids.include?(storage.id)
 
-        updated = read_network_fixtures << network
-        save_network_fixtures(updated)
+        updated = read_storage_fixtures << storage
+        save_storage_fixtures(updated)
 
-        network.id
+        storage.id
       end
 
-      # Deletes all network instances, instances to be deleted must be filtered
+      # Deletes all storage instances, instances to be deleted must be filtered
       # by the specified filter, filter (if set) must contain an ::Occi::Core::Mixins instance.
       # If the requested instances cannot be deleted, an error describing the
       # problem must be raised, @see Backends::Errors.
@@ -94,17 +94,17 @@ module Backends
       # @return [true, false] result of the operation
       def delete_all(mixins = nil)
         if mixins.blank?
-          drop_network_fixtures
-          read_network_fixtures.empty?
+          drop_storage_fixtures
+          read_storage_fixtures.empty?
         else
-          old_count = read_network_fixtures.count
-          updated = read_network_fixtures.delete_if { |n| (n.mixins & mixins).any? }
-          save_network_fixtures(updated)
-          old_count != read_network_fixtures.count
+          old_count = read_storage_fixtures.count
+          updated = read_storage_fixtures.delete_if { |s| (s.mixins & mixins).any? }
+          save_storage_fixtures(updated)
+          old_count != read_storage_fixtures.count
         end
       end
 
-      # Deletes a specific network instance, instance to be deleted is
+      # Deletes a specific storage instance, instance to be deleted is
       # specified by an ID, this ID must match the occi.core.id attribute
       # of the deleted instance.
       # If the requested instance cannot be deleted, an error describing the
@@ -113,24 +113,24 @@ module Backends
       # @example
       #    delete("65d4f65adfadf-ad2f4ad-daf5ad-f5ad4fad4ffdf") #=> true
       #
-      # @param network_id [String] an identifier of a network instance to be deleted
+      # @param storage_id [String] an identifier of a storage instance to be deleted
       # @return [true, false] result of the operation
-      def delete(network_id)
-        fail Backends::Errors::ResourceNotFoundError, "Instance with ID #{network_id} does not exist!" unless list_ids.include?(network_id)
+      def delete(storage_id)
+        fail Backends::Errors::ResourceNotFoundError, "Instance with ID #{storage_id} does not exist!" unless list_ids.include?(storage_id)
 
-        updated = read_network_fixtures.delete_if { |n| n.id == network_id }
-        save_network_fixtures(updated)
+        updated = read_storage_fixtures.delete_if { |s| s.id == storage_id }
+        save_storage_fixtures(updated)
 
         begin
-          get(network_id)
+          get(storage_id)
           false
         rescue Backends::Errors::ResourceNotFoundError
           true
         end
       end
 
-      # Partially updates an existing network instance, instance to be updated
-      # is specified by network_id.
+      # Partially updates an existing storage instance, instance to be updated
+      # is specified by storage_id.
       # If the requested instance cannot be updated, an error describing the
       # problem must be raised, @see Backends::Errors.
       #
@@ -138,39 +138,39 @@ module Backends
       #    attributes = ::Occi::Core::Attributes.new
       #    mixins = ::Occi::Core::Mixins.new
       #    links = ::Occi::Core::Links.new
-      #    partial_update(network_id, attributes, mixins, links) #=> true
+      #    partial_update(storage_id, attributes, mixins, links) #=> true
       #
-      # @param network_id [String] unique identifier of a network instance to be updated
+      # @param storage_id [String] unique identifier of a storage instance to be updated
       # @param attributes [::Occi::Core::Attributes] a collection of attributes to be updated
       # @param mixins [::Occi::Core::Mixins] a collection of mixins to be added
       # @param links [::Occi::Core::Links] a collection of links to be added
       # @return [true, false] result of the operation
-      def partial_update(network_id, attributes = nil, mixins = nil, links = nil)
+      def partial_update(storage_id, attributes = nil, mixins = nil, links = nil)
         # TODO: impl
         fail Backends::Errors::MethodNotImplementedError, 'Partial updates are currently not supported!'
       end
 
-      # Updates an existing network instance, instance to be updated is specified
+      # Updates an existing storage instance, instance to be updated is specified
       # using the occi.core.id attribute of the instance passed as an argument.
       # If the requested instance cannot be updated, an error describing the
       # problem must be raised, @see Backends::Errors.
       #
       # @example
-      #    network = ::Occi::Infrastructure::Network.new
-      #    update(network) #=> true
+      #    storage = ::Occi::Infrastructure::Storage.new
+      #    update(storage) #=> true
       #
-      # @param network [::Occi::Infrastructure::Network] instance containing updated information
+      # @param storage [::Occi::Infrastructure::Storage] instance containing updated information
       # @return [true, false] result of the operation
-      def update(network)
-        fail Backends::Errors::ResourceNotFoundError, "Instance with ID #{network.id} does not exist!" unless list_ids.include?(network.id)
+      def update(storage)
+        fail Backends::Errors::ResourceNotFoundError, "Instance with ID #{storage.id} does not exist!" unless list_ids.include?(storage.id)
 
-        delete(network.id)
-        updated = read_network_fixtures << network
-        save_network_fixtures(updated)
-        get(network.id) == network
+        delete(storage.id)
+        updated = read_storage_fixtures << storage
+        save_storage_fixtures(updated)
+        get(storage.id) == storage
       end
 
-      # Triggers an action on all existing network instance, instances must be filtered
+      # Triggers an action on all existing storage instance, instances must be filtered
       # by the specified filter, filter (if set) must contain an ::Occi::Core::Mixins instance,
       # action is identified by the action.term attribute of the action instance passed as an argument.
       # If the requested action cannot be triggered, an error describing the
@@ -185,12 +185,12 @@ module Backends
       # @param mixins [::Occi::Core::Mixins] a filter containing mixins
       # @return [true, false] result of the operation
       def trigger_action_on_all(action_instance, mixins = nil)
-        list_ids(mixins).each { |ntwrk| trigger_action(ntwrk, action_instance) }
+        list_ids(mixins).each { |strg| trigger_action(strg, action_instance) }
         true
       end
 
-      # Triggers an action on an existing network instance, the network instance in question
-      # is identified by a network instance ID, action is identified by the action.term attribute
+      # Triggers an action on an existing storage instance, the storage instance in question
+      # is identified by a storage instance ID, action is identified by the action.term attribute
       # of the action instance passed as an argument.
       # If the requested action cannot be triggered, an error describing the
       # problem must be raised, @see Backends::Errors.
@@ -200,28 +200,34 @@ module Backends
       #    trigger_action("65d4f65adfadf-ad2f4ad-daf5ad-f5ad4fad4ffdf", action_instance)
       #      #=> true
       #
-      # @param network_id [String] network instance identifier
+      # @param storage_id [String] storage instance identifier
       # @param action_instance [::Occi::Core::ActionInstance] action to be triggered
       # @return [true, false] result of the operation
-      def trigger_action(network_id, action_instance)
+      def trigger_action(storage_id, action_instance)
         case action_instance.action.type_identifier
-        when 'http://schemas.ogf.org/occi/infrastructure/network/action#down'
-          state = 'inactive'
-        when 'http://schemas.ogf.org/occi/infrastructure/network/action#up'
-          state = 'active'
+        when 'http://schemas.ogf.org/occi/infrastructure/storage/action#offline'
+          state = 'offline'
+        when 'http://schemas.ogf.org/occi/infrastructure/storage/action#online'
+          state = 'online'
+        when 'http://schemas.ogf.org/occi/infrastructure/storage/action#backup'
+          state = 'online'
+        when 'http://schemas.ogf.org/occi/infrastructure/storage/action#resize'
+          state = 'online'
+        when 'http://schemas.ogf.org/occi/infrastructure/storage/action#snapshot'
+          state = 'online'
         else
           fail Backends::Errors::ActionNotImplementedError,
                "Action #{action_instance.action.type_identifier.inspect} is not implemented!"
         end
 
-        # get existing network instance and set a new state
-        network = get(network_id)
-        network.state = state
+        # get existing storage instance and set a new state
+        storage = get(storage_id)
+        storage.state = state
 
         # clean-up and save the new collection
-        delete(network.id)
-        updated = read_network_fixtures << network
-        save_network_fixtures(updated)
+        delete(storage.id)
+        updated = read_storage_fixtures << storage
+        save_storage_fixtures(updated)
 
         true
       end

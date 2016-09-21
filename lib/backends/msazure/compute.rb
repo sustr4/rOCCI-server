@@ -1,6 +1,6 @@
 module Backends
-  module Azure
-    class Compute < Backends::Azure::Base
+  module Msazure
+    class Compute < Backends::Msazure::Base
       # Gets all compute instance IDs, no details, no duplicates. Returned
       # identifiers must correspond to those found in the occi.core.id
       # attribute of ::Occi::Infrastructure::Compute instances.

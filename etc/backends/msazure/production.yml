@@ -1,0 +1,6 @@
+model_extensions_dir: <%= File.join(Rails.application.config.rocci_server_etc_dir, 'backends', 'msazure', 'model') %>
+fixtures_dir: <%= File.join(Rails.application.config.rocci_server_etc_dir, 'backends', 'msazure', 'fixtures') %>
+subscription_id: <%= ENV['ROCCI_SERVER_MSAZURE_SUBSCRIPTION_ID'] %>
+tenant_id: <%= ENV['ROCCI_SERVER_MSAZURE_TENANT_ID'] %>
+client_id: <%= ENV['ROCCI_SERVER_MSAZURE_CLIENT_ID'] %>
+client_secret: <%= ENV['ROCCI_SERVER_MSAZURE_CLIENT_SECRET'] %>

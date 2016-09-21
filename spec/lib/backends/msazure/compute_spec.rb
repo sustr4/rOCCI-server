@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Backends::Azure::Compute do
+describe Backends::Msazure::Compute do
   let(:dalli) { Dalli::Client.new }
   let(:dummy_w_opts) do
     opts = Hashie::Mash.new
-    opts.fixtures_dir = Rails.application.config.rocci_server_etc_dir.join('backends', 'azure', 'fixtures')
-    Backends::Azure::Compute.new nil, opts, nil, nil, dalli
+    opts.fixtures_dir = Rails.application.config.rocci_server_etc_dir.join('backends', 'msazure', 'fixtures')
+    Backends::Msazure::Compute.new nil, opts, nil, nil, dalli
   end
 
   before(:each) { dalli.flush }
@@ -13,7 +13,7 @@ describe Backends::Azure::Compute do
 
   describe '#new' do
     it 'fails to instantiate without a fixtures_dir' do
-      expect { Backends::Azure::Compute.new nil, nil, nil, nil, dalli }.to raise_error
+      expect { Backends::Msazure::Compute.new nil, nil, nil, nil, dalli }.to raise_error
     end
   end
 

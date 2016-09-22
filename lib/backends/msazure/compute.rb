@@ -75,12 +75,12 @@ module Backends
         # Once the mixin is associated, you can set attributes it adds to the compute
         # instance.
         ###
-        if mixins.blank?
-          read_compute_fixtures
-        else
-          filtered_computes = read_compute_fixtures.to_a.select { |c| (c.mixins & mixins).any? }
-          ::Occi::Core::Resources.new filtered_computes
+        computes = ::Occi::Core::Resources.new
+#        @msazure_resource_client.resource_groups.list_resources(@options.resource_group).each do |res|
+        @msazure_compute_client.virtual_machines.list_all.each do |res|
+          computes << parse_backend_obj(res)
         end
+        computes
       end
 
       # Gets a specific compute instance as ::Occi::Infrastructure::Compute.
@@ -612,6 +612,9 @@ module Backends
       # @return [::Occi::Core::Mixins] a collection of mixins
       def list_resource_tpl
         ::Occi::Core::Mixins.new
+        f=File.open('/tmp/sizes.txt', 'w')
+        f.write(YAML::dump(@msazure_compute_client.virtual_machine_sizes.inspect))
+        f.close
       end
 
       # Gets a specific resource_tpl mixin instance as ::Occi::Core::Mixin.
@@ -635,6 +638,9 @@ module Backends
 
         found
       end
+
+      # Load methods called from list/get
+      include Backends::Msazure::Helpers::ComputeParseHelper
     end
   end
 end

@@ -15,11 +15,14 @@ module Backends
         @logger = logger || Rails.logger
         @dalli_cache = dalli_cache
         @other_backends = {}
-#        @msazure_client = nil
+        @msazure_resource_client = nil
+        @msazure_compute_client = nil
+        @msazure_storage_client = nil
+        @msazure_network_client = nil
+        @msazure_location = 'westus' # TODO make configurable
 
         # establish connection with Msazure
-#        run_authn unless Rails.env.test? # disable early auth for tests
-
+        run_authn unless Rails.env.test? # disable early auth for tests
 
         path = @options.fixtures_dir || '' # TODO Remove eventually?
         read_fixtures(path)
@@ -103,25 +106,32 @@ end
       end
 
 
-#      def run_authn
-#        return if @msazure_client
-#
-#        @resource_group = resource_group
-#        @subscription_id = subscription_id
-#        pub_ssh_key_path = File.expand_path('~/.ssh/id_rsa.pub') #TODO remove hard-coded key
-#        raise ArgumentError.new("The path: #{pub_ssh_key_path} does not exist.") unless File.exist?(pub_ssh_key_path)
-#        @pub_ssh_key = File.read(pub_ssh_key_path)
-#        provider = MsRestAzure::ApplicationTokenProvider.new(
-#            @options.tenant_id,
-#            @options.client_id,
-#            @options.client_secret)
-#        credentials = MsRest::TokenCredentials.new(provider)
-#        @msazure_client = Azure::ARM::Resources::ResourceManagementClient.new(credentials)
-#
-#        fail Backends::Errors::AuthenticationError, 'Could not get an Msazure client for the current user!' unless @msazure_client
-#        @msazure_client.subscription_id = @options.subscription_id
-#
-#      end
+      def run_authn
+        return if @msazure_resource_client || @msazure_compute_client || @msazure_storage_client || @msazure_network_client
+
+        pub_ssh_key_path = File.expand_path('~/.ssh/id_rsa.pub') #TODO remove hard-coded key
+        raise ArgumentError.new("The path: #{pub_ssh_key_path} does not exist.") unless File.exist?(pub_ssh_key_path)
+        @pub_ssh_key = File.read(pub_ssh_key_path)
+        provider = MsRestAzure::ApplicationTokenProvider.new(
+            @options.tenant_id,
+            @options.client_id,
+            @options.client_secret)
+        credentials = MsRest::TokenCredentials.new(provider)
+        @msazure_resource_client = Azure::ARM::Resources::ResourceManagementClient.new(credentials)
+        fail Backends::Errors::AuthenticationError, 'Could not get a MsAzure Resource client for the current user!' unless @msazure_resource_client
+        @msazure_compute_client = Azure::ARM::Compute::ComputeManagementClient.new(credentials)
+        fail Backends::Errors::AuthenticationError, 'Could not get a MsAzure Compute client for the current user!' unless @msazure_compute_client
+        @msazure_storage_client = Azure::ARM::Storage::StorageManagementClient.new(credentials)
+        fail Backends::Errors::AuthenticationError, 'Could not get a MsAzure Storage client for the current user!' unless @msazure_storage_client
+        @msazure_network_client = Azure::ARM::Network::NetworkManagementClient.new(credentials)
+        fail Backends::Errors::AuthenticationError, 'Could not get a MsAzure Network client for the current user!' unless @msazure_network_client
+
+        @msazure_resource_client.subscription_id = @options.subscription_id
+        @msazure_compute_client.subscription_id = @options.subscription_id
+        @msazure_storage_client.subscription_id = @options.subscription_id
+        @msazure_network_client.subscription_id = @options.subscription_id
+
+      end
 
     end
   end

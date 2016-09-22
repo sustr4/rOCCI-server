@@ -1,2 +1,5 @@
 # Deps for the Msazure backend
-gem 'azure_mgmt_resources', '~> 0.4.0'
+gem 'azure_mgmt_resources', '~>0.5.0'
+gem 'azure_mgmt_compute',   '~>0.5.0'
+gem 'azure_mgmt_network',   '~>0.5.0'
+gem 'azure_mgmt_storage',   '~>0.5.0'

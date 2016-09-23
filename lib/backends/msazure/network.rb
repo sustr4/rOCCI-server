@@ -32,11 +32,15 @@ module Backends
       # @return [::Occi::Core::Resources] a collection of network instances
       def list(mixins = nil)
         if mixins.blank?
-          read_network_fixtures
+        networks = ::Occi::Core::Resources.new
+          @msazure_network_client.virtual_networks.list_all.each do |res|
+            networks << parse_backend_obj(res)
+          end
         else
           filtered_networks = read_network_fixtures.to_a.select { |n| (n.mixins & mixins).any? }
           ::Occi::Core::Resources.new filtered_networks
         end
+        networks
       end
 
       # Gets a specific network instance as ::Occi::Infrastructure::Network.
@@ -234,6 +238,10 @@ module Backends
         # no extensions to include
         ::Occi::Collection.new
       end
+
+      # Load methods called from list/get
+      include Backends::Msazure::Helpers::NetworkParseHelper
+
     end
   end
 end

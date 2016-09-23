@@ -17,8 +17,8 @@ module Backends
 #          compute.mixins << "#{@options.backend_scheme}/occi/infrastructure/os_tpl##{image_to_term(backend_compute)}"
 #          compute.mixins << 'http://schemas.ec2.aws.amazon.com/occi/infrastructure/compute#aws_ec2_instance'
 
-          compute.attributes['occi.core.id'] = res.send("id").gsub('^/','')
-          compute.attributes['occi.core.title'] = res.send("name").gsub('^/','')
+          compute.attributes['occi.core.id'] = res.send("id").gsub(/^\//,'')
+          compute.attributes['occi.core.title'] = res.send("name")
 #          compute.attributes['occi.compute.architecture'] = (backend_compute[:architecture] == 'x86_64') ? 'x64' : 'x86'
 
 #          compute.attributes['com.amazon.aws.ec2.reservation_id'] = reservation_id unless reservation_id.blank?

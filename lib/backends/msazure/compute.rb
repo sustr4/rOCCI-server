@@ -611,10 +611,12 @@ module Backends
       #
       # @return [::Occi::Core::Mixins] a collection of mixins
       def list_resource_tpl
-        ::Occi::Core::Mixins.new
-        f=File.open('/tmp/sizes.txt', 'w')
-        f.write(YAML::dump(@msazure_compute_client.virtual_machine_sizes.inspect))
-        f.close
+        tpls = ::Occi::Core::Mixins.new
+
+        @msazure_compute_client.virtual_machine_sizes.list(@msazure_location).value.each do |tpl|
+          tpls << parse_backend_res_tpl(tpl)
+        end
+        tpls
       end
 
       # Gets a specific resource_tpl mixin instance as ::Occi::Core::Mixin.

@@ -21,6 +21,8 @@ module Backends
         @msazure_network_client = nil
         @msazure_location = 'westus' # TODO make configurable
 
+        @options.backend_scheme ||= "http://occi.#{@server_properties.hostname || 'localhost'}"
+
         # establish connection with Msazure
         run_authn unless Rails.env.test? # disable early auth for tests
 

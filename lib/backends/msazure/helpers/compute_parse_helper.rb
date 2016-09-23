@@ -38,6 +38,27 @@ module Backends
 
           compute
         end
+
+        def parse_backend_res_tpl(restpl)
+          depends = %w|http://schemas.ogf.org/occi/infrastructure#resource_tpl|
+#          term = restpl.send("name").downcase.gsub('_','')
+          term = restpl.send("name")
+          scheme = "#{@options.backend_scheme}/occi/infrastructure/resource_tpl#"
+          title = restpl.send("name")
+          location = "/mixin/resource_tpl/#{term}/"
+          applies = %w|http://schemas.ogf.org/occi/infrastructure#compute|
+
+          resource_tpl = ::Occi::Core::Mixin.new(scheme, term, title, nil, depends, nil, location, applies)
+
+          resource_tpl.attributes["occi.compute.cores"] = restpl.send("number_of_cores")
+          resource_tpl.attributes["occi.compute.memory"] = restpl.send("memory_in_mb") / 1024
+          resource_tpl.attributes["occi.compute.architecture"] = "x86" # FIXME: This is obviously a shortcut
+          resource_tpl.attributes["com.azure.max_data_disk_count"] = restpl.send("max_data_disk_count")
+          resource_tpl.attributes["com.azure.os_disk_size_in_mb"] = restpl.send("os_disk_size_in_mb")
+          resource_tpl.attributes["com.azure.resource_disk_size_in_mb"] = restpl.send("resource_disk_size_in_mb")
+
+          resource_tpl
+        end
       end
     end
   end
